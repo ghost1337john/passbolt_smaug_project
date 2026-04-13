@@ -1,3 +1,4 @@
+<img width="1536" height="1024" alt="Copilot_20260413_171725" src="https://github.com/user-attachments/assets/7e57c814-8793-43ea-af06-c2752075048b" />
 
 # 🛡️ Passbolt Docker Stack — Installation & Sauvegarde
 
