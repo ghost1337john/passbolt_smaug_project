@@ -1,0 +1,67 @@
+networks:
+  bdd_passbolt:
+    name: bdd_passbolt
+    # external: true
+    driver: bridge
+
+  proxy:
+    external: true
+    # name: proxy
+    # driver: bridge
+
+services:
+  db:
+    container_name: db
+    image: mariadb:11.8.6 #Dernière version de MariaDB compatible avec Passbolt au moment de la rédaction - changer si besoin pour une version plus récente
+    restart: unless-stopped
+    env_file:
+      - ./passbolt.env
+    networks:
+      - bdd_passbolt
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
+      MYSQL_DATABASE: "passbolt"
+      MYSQL_USER: $MYSQL_USER
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+    volumes:
+      - ${PASSBOLT_BASE_PATH}/database_volume:/var/lib/mysql
+     
+  passbolt:
+    image: passbolt/passbolt:latest-ce
+    container_name: passbolt
+    # Alternatively you can use rootless:
+    # image: passbolt/passbolt:latest-ce-non-root
+    restart: unless-stopped
+    env_file:
+      - ./passbolt.env
+    networks:
+      - bdd_passbolt
+      - proxy
+    depends_on:
+      - db
+    environment:
+      APP_FULL_BASE_URL: "https://passbolt.ghosthaven.org"
+      DATASOURCES_DEFAULT_HOST: "db"
+      DATASOURCES_DEFAULT_USERNAME: $MYSQL_USER
+      DATASOURCES_DEFAULT_PASSWORD: $MYSQL_PASSWORD
+      DATASOURCES_DEFAULT_DATABASE: "passbolt"
+      EMAIL_DEFAULT_FROM_NAME: $EMAIL_DEFAULT_FROM_NAME
+      EMAIL_DEFAULT_FROM: $EMAIL_TRANSPORT_DEFAULT_USERNAME
+      EMAIL_TRANSPORT_DEFAULT_HOST: $EMAIL_TRANSPORT_DEFAULT_HOST
+      EMAIL_TRANSPORT_DEFAULT_PORT: $EMAIL_TRANSPORT_DEFAULT_PORT
+      EMAIL_TRANSPORT_DEFAULT_USERNAME: $EMAIL_TRANSPORT_DEFAULT_USERNAME
+      EMAIL_TRANSPORT_DEFAULT_PASSWORD: $EMAIL_TRANSPORT_DEFAULT_PASSWORD
+      EMAIL_TRANSPORT_DEFAULT_TLS: $EMAIL_TRANSPORT_DEFAULT_TLS
+    volumes:
+      - ${PASSBOLT_BASE_PATH}/gpg_volume:/etc/passbolt/gpg
+      - ${PASSBOLT_BASE_PATH}/jwt_volume:/etc/passbolt/jwt
+      - ${PASSBOLT_BASE_PATH}/nginx/passbolt-ssl.conf:/etc/nginx/snippets/passbolt-ssl.conf:ro
+    command:
+      [
+        "/usr/bin/wait-for.sh",
+        "-t",
+        "0",
+        "db:3306",
+        "--",
+        "/docker-entrypoint.sh"
+      ]
