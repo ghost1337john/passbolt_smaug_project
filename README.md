@@ -27,24 +27,6 @@ Le projet fournit :
 - une exposition directe de Passbolt sur `http://localhost:8080`
 - des scripts de sauvegarde et restauration dans le dossier Sauvegarde
 
-## Demarrage rapide
-
-Cloner le depot puis se placer dans le dossier d'installation :
-
-```bash
-git clone https://github.com/ghost1337john/Passbolt_Smaug_Project.git
-cd Passbolt_Smaug_Project/Installation
-cp passbolt.env.example passbolt.env
-docker compose --env-file passbolt.env config
-docker compose --env-file passbolt.env up -d
-```
-
-Passbolt sera ensuite accessible sur :
-
-```text
-http://localhost:8080
-```
-
 ## Structure du projet
 
 ```text
