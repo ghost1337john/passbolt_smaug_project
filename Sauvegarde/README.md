@@ -47,7 +47,7 @@ echo 'GPG_KEY="TON_FINGERPRINT_GPG"' | sudo tee /etc/default/passbolt-backup > /
 
 ## Fichiers
 - `backup.sh` : cree un backup chiffre GPG + checksum SHA256 + rotation des archives
-- `restore.sh` : dechiffre et restaure base + volumes + permissions + redemarrage des conteneurs
+- `restore.sh` : dechiffre et restaure le dump SQL, les volumes Passbolt et les permissions, puis redemarre les conteneurs
 
 ## Permissions
 Rendre les scripts executables :
@@ -86,7 +86,14 @@ sudo ./Sauvegarde/restore.sh ${PASSBOLT_BASE_PATH}/backup/passbolt_backup_YYYY-M
 Le script de restauration :
 - verifie automatiquement le checksum SHA256 si le fichier `.sha256` est present
 - nettoie automatiquement son repertoire temporaire apres execution
-- restaure `database_volume`, `gpg_volume` et `jwt_volume`
+- restaure la base a partir du dump SQL
+- restaure `gpg_volume` et `jwt_volume`
+- recree les repertoires cibles si necessaire
+- reapplique les permissions `www-data:www-data` sur les repertoires Passbolt
+
+Important :
+- la restauration de la base repose sur le dump SQL, pas sur une copie brute du datadir MariaDB
+- cela evite de melanger une restauration logique (SQL) et une restauration fichier a fichier de `database_volume`
 
 ## Verifications apres restauration
 - Ouvrir l'instance : `http://localhost:8080` ou l'URL definie dans `APP_FULL_BASE_URL`

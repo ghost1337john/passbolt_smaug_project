@@ -46,7 +46,7 @@ sudo docker inspect "$DB_CONTAINER" > "$BACKUP_DIR/db_config.json"
 echo "[5/7] Creation de l'archive..."
 sudo tar -czf "$ARCHIVE" \
   -C "$BACKUP_DIR" db.sql serverkey_private.asc serverkey.asc passbolt_config.json db_config.json \
-  -C "$PASSBOLT_BASE_PATH" database_volume gpg_volume jwt_volume
+  -C "$PASSBOLT_BASE_PATH" gpg_volume jwt_volume
 
 echo "Nettoyage des fichiers temporaires..."
 rm -f "$BACKUP_DIR/db.sql" "$BACKUP_DIR/serverkey_private.asc" "$BACKUP_DIR/serverkey.asc" "$BACKUP_DIR/passbolt_config.json" "$BACKUP_DIR/db_config.json"
