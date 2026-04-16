@@ -50,6 +50,9 @@ Variables a renseigner dans `passbolt.env` :
 - `EMAIL_TRANSPORT_DEFAULT_PORT` : port SMTP
 - `EMAIL_TRANSPORT_DEFAULT_PASSWORD` : mot de passe SMTP
 - `EMAIL_TRANSPORT_DEFAULT_TLS` : `tls`, `ssl` ou `false` selon ton serveur SMTP
+- `BACKUP_DIR` : dossier cible des sauvegardes (ex: `/app/passbolt/backup`)
+- `GPG_KEY` : fingerprint de la cle publique utilisee pour chiffrer les sauvegardes
+- `GPG_EXEC_USER` : utilisateur dont le trousseau GPG est utilise par `backup.sh` et `restore.sh`
 
 Exemple minimal :
 
@@ -64,6 +67,9 @@ EMAIL_TRANSPORT_DEFAULT_HOST=smtp.example.com
 EMAIL_TRANSPORT_DEFAULT_PORT=587
 EMAIL_TRANSPORT_DEFAULT_PASSWORD=ChangeMe
 EMAIL_TRANSPORT_DEFAULT_TLS=tls
+BACKUP_DIR=/app/passbolt/backup
+GPG_KEY=TON_FINGERPRINT_GPG
+GPG_EXEC_USER=root
 ```
 
 ## 2. Preparer les dossiers sur l'hote

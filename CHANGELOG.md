@@ -4,6 +4,23 @@ Toutes les evolutions notables de ce projet sont documentees dans ce fichier.
 
 Le format suit l'esprit de Keep a Changelog et la versioning SemVer.
 
+## [1.0.1] - 2026-04-15
+
+Commits concernes: `bd495bc`
+
+### Added
+- Ajout de la variable `MANUAL_BACKUP_DIR` dans `Sauvegarde/backup.sh` pour definir un dossier de sauvegarde fixe.
+
+### Changed
+- Priorite du dossier de sauvegarde ajustee dans `Sauvegarde/backup.sh`:
+  - `MANUAL_BACKUP_DIR` prioritaire
+  - puis `BACKUP_DIR`
+  - puis valeur par defaut `${PASSBOLT_BASE_PATH}/backup`
+
+### Docs
+- Mise a jour de `Sauvegarde/README.md` pour documenter `MANUAL_BACKUP_DIR`.
+- Ajout d'une recommandation d'usage via cron avec chemin de sortie stable.
+
 ## [1.0.0] - 2026-04-15
 
 ### Added

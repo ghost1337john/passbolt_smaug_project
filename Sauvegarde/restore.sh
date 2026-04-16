@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# Configuration manuelle GPG
-# Renseigne ici l'utilisateur GPG utilise pour le dechiffrement.
-MANUAL_GPG_EXEC_USER=""
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="${PASSBOLT_ENV_FILE:-$SCRIPT_DIR/../Installation/passbolt.env}"
 
@@ -16,7 +12,7 @@ fi
 
 PASSBOLT_BASE_PATH="${PASSBOLT_BASE_PATH:-/app/passbolt}"
 BACKUP_FILE="${1:-}"
-GPG_EXEC_USER="${MANUAL_GPG_EXEC_USER:-${GPG_EXEC_USER:-${SUDO_USER:-}}}"
+GPG_EXEC_USER="${GPG_EXEC_USER:-${SUDO_USER:-}}"
 
 if [ -z "$BACKUP_FILE" ]; then
   echo "Usage: ./restore.sh <backup_file.tar.gz.gpg>"

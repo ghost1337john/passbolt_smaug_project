@@ -62,7 +62,7 @@ Le dossier [Sauvegarde](Sauvegarde) contient :
 - [Sauvegarde/restore.sh](Sauvegarde/restore.sh) pour restaurer une sauvegarde
 - [Sauvegarde/README.md](Sauvegarde/README.md) pour la procedure detaillee
 
-Les scripts de sauvegarde et restauration se configurent directement en tete de script pour la partie GPG.
+Les scripts de sauvegarde et restauration lisent leur configuration (GPG et dossier de backup) depuis `Installation/passbolt.env`.
 
 ## Notes de securite
 

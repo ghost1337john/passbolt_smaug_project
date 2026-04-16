@@ -6,13 +6,13 @@ Ce dossier contient les scripts pour sauvegarder et restaurer une instance Passb
 - Conteneur application : `passbolt`
 - Conteneur base : `db`
 - Dossier principal : `PASSBOLT_BASE_PATH` lu depuis `Installation/passbolt.env`
-- Dossier backup : `${PASSBOLT_BASE_PATH}/backup`, cree automatiquement par `backup.sh` si besoin
+- Dossier backup : `BACKUP_DIR` lu depuis `Installation/passbolt.env` (defaut : `${PASSBOLT_BASE_PATH}/backup`)
 - UID MariaDB : `999`
-- Cle GPG backup : configurable dans `backup.sh` via `MANUAL_GPG_KEY`
-- Utilisateur GPG optionnel : configurable dans `backup.sh` et `restore.sh` via `MANUAL_GPG_EXEC_USER`
+- Cle GPG backup : variable `GPG_KEY` dans `Installation/passbolt.env`
+- Utilisateur GPG optionnel : variable `GPG_EXEC_USER` dans `Installation/passbolt.env`
 
 Par defaut, si `Installation/passbolt.env` est present, les scripts chargent automatiquement `PASSBOLT_BASE_PATH` depuis ce fichier.
-Par defaut, `backup.sh` chiffre et `restore.sh` dechiffre avec le trousseau GPG de l'utilisateur courant. Si le script est lance avec `sudo`, il essaie d'utiliser le trousseau de `SUDO_USER`. Tu peux forcer l'utilisateur a utiliser avec `MANUAL_GPG_EXEC_USER` dans le script.
+Par defaut, `backup.sh` chiffre et `restore.sh` dechiffre avec le trousseau GPG de l'utilisateur courant. Si le script est lance avec `sudo`, il essaie d'utiliser le trousseau de `SUDO_USER`. Tu peux forcer l'utilisateur a utiliser avec `GPG_EXEC_USER` dans `Installation/passbolt.env`.
 
 Important : la variable `PASSBOLT_BASE_PATH` est chargee automatiquement par les scripts, mais pas par ton shell. Dans les commandes documentees ci-dessous, remplace `${PASSBOLT_BASE_PATH}` par le chemin reel si cette variable n'est pas exportee dans ton terminal.
 
@@ -37,11 +37,11 @@ gpg --fingerprint <email_ou_keyid>
 gpg --armor --export <email_ou_keyid> > backup_public.asc
 ```
 
-4) Configurer directement `Sauvegarde/backup.sh` avec le fingerprint trouve :
+4) Configurer `Installation/passbolt.env` avec le fingerprint trouve :
 
-```bash
-MANUAL_GPG_KEY="TON_FINGERPRINT_GPG"
-MANUAL_GPG_EXEC_USER="ton_utilisateur"
+```env
+GPG_KEY=TON_FINGERPRINT_GPG
+GPG_EXEC_USER=ton_utilisateur
 ```
 
 ## Fichiers
@@ -57,15 +57,15 @@ chmod +x Sauvegarde/backup.sh Sauvegarde/restore.sh
 
 ## Backup manuel
 
-Le dossier `${PASSBOLT_BASE_PATH}/backup` n'a pas besoin d'etre cree a la main : le script `backup.sh` le cree automatiquement au lancement.
+Le dossier defini dans `BACKUP_DIR` n'a pas besoin d'etre cree a la main : le script `backup.sh` le cree automatiquement au lancement.
 Le script verifie aussi que la cle `GPG_KEY` est bien presente dans le trousseau GPG utilise avant de lancer le chiffrement.
 
-Configuration directe dans `Sauvegarde/backup.sh` :
+Configuration recommandee dans `Installation/passbolt.env` :
 
-```bash
-MANUAL_GPG_KEY="TON_FINGERPRINT_GPG"
-MANUAL_GPG_EXEC_USER="ton_utilisateur"
-MANUAL_BACKUP_DIR="/mnt/backup/passbolt"
+```env
+GPG_KEY=TON_FINGERPRINT_GPG
+GPG_EXEC_USER=ton_utilisateur
+BACKUP_DIR=/mnt/backup/passbolt
 ```
 
 Puis :
@@ -74,7 +74,7 @@ Puis :
 sudo ./Sauvegarde/backup.sh
 ```
 
-`MANUAL_BACKUP_DIR` est recommande pour un usage via cron : le repertoire de destination reste fixe d'une execution a l'autre.
+`BACKUP_DIR` est recommande pour un usage via cron : le repertoire de destination reste fixe d'une execution a l'autre.
 
 Sortie attendue :
 
@@ -83,7 +83,7 @@ Backup termine : ${PASSBOLT_BASE_PATH}/backup/passbolt_backup_YYYY-MM-DD_HH-MM-S
 Checksum : ${PASSBOLT_BASE_PATH}/backup/passbolt_backup_YYYY-MM-DD_HH-MM-SS.tar.gz.gpg.sha256
 ```
 
-Si `MANUAL_BACKUP_DIR` est defini, le chemin affiche dans la sortie correspond a ce dossier.
+Si `BACKUP_DIR` est defini, le chemin affiche dans la sortie correspond a ce dossier.
 
 ## Verifier une sauvegarde
 
@@ -112,7 +112,7 @@ Tu dois au minimum retrouver : `db.sql`, `serverkey_private.asc`, `serverkey.asc
 Avant d'activer le cron :
 - verifier qu'un backup manuel fonctionne
 - utiliser le chemin absolu du projet dans la commande cron
-- verifier que `MANUAL_GPG_KEY` et `MANUAL_GPG_EXEC_USER` sont correctement renseignes dans `backup.sh`
+- verifier que `GPG_KEY`, `GPG_EXEC_USER` et `BACKUP_DIR` sont correctement renseignes dans `Installation/passbolt.env`
 
 ### 1. Identifier le chemin absolu du projet
 
@@ -146,8 +146,9 @@ Ajouter par exemple une sauvegarde tous les jours a minuit :
 
 Points a verifier :
 - le chemin vers `backup.sh` est absolu
-- `MANUAL_GPG_KEY` est correcte dans `backup.sh`
-- `MANUAL_GPG_EXEC_USER` est defini si la cle n'est pas dans le trousseau root
+- `GPG_KEY` est correcte dans `Installation/passbolt.env`
+- `GPG_EXEC_USER` est defini si la cle n'est pas dans le trousseau root
+- `BACKUP_DIR` pointe vers le dossier attendu
 - le script est executable
 
 Commande utile :
@@ -166,10 +167,10 @@ sudo tail -n 50 /var/log/passbolt-backup.log
 
 ## Restauration
 
-Configuration directe dans `Sauvegarde/restore.sh` :
+Configuration dans `Installation/passbolt.env` :
 
-```bash
-MANUAL_GPG_EXEC_USER="ton_utilisateur"
+```env
+GPG_EXEC_USER=ton_utilisateur
 ```
 
 Puis :

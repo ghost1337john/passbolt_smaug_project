@@ -1,14 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# Configuration manuelle GPG
-# Renseigne ici la cle GPG et l'utilisateur GPG utilises par le script.
-MANUAL_GPG_KEY=""
-MANUAL_GPG_EXEC_USER=""
-# Renseigne ici un dossier de backup fixe (recommande pour cron).
-# Exemple : MANUAL_BACKUP_DIR="/mnt/backup/passbolt"
-MANUAL_BACKUP_DIR=""
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="${PASSBOLT_ENV_FILE:-$SCRIPT_DIR/../Installation/passbolt.env}"
 
@@ -19,14 +11,14 @@ if [ -f "$ENV_FILE" ]; then
 fi
 
 PASSBOLT_BASE_PATH="${PASSBOLT_BASE_PATH:-/app/passbolt}"
-BACKUP_DIR="${MANUAL_BACKUP_DIR:-${BACKUP_DIR:-$PASSBOLT_BASE_PATH/backup}}"
+BACKUP_DIR="${BACKUP_DIR:-$PASSBOLT_BASE_PATH/backup}"
 DB_CONTAINER="db"
 PASSBOLT_CONTAINER="passbolt"
 DATE=$(date +"%Y-%m-%d_%H-%M-%S")
 ARCHIVE="$BACKUP_DIR/passbolt_backup_$DATE.tar.gz"
 MAX_BACKUPS=10
-GPG_KEY="${MANUAL_GPG_KEY:-${GPG_KEY:-}}"
-GPG_EXEC_USER="${MANUAL_GPG_EXEC_USER:-${GPG_EXEC_USER:-${SUDO_USER:-}}}"
+GPG_KEY="${GPG_KEY:-}"
+GPG_EXEC_USER="${GPG_EXEC_USER:-${SUDO_USER:-}}"
 
 if [ -n "$GPG_EXEC_USER" ] && [ "$EUID" -eq 0 ]; then
   GPG_EXEC_HOME=$(getent passwd "$GPG_EXEC_USER" | cut -d: -f6)
@@ -41,7 +33,7 @@ fi
 
 if [ -z "$GPG_KEY" ]; then
   echo "Erreur: variable GPG_KEY non definie."
-  echo "Definis MANUAL_GPG_KEY en haut du script avant execution."
+  echo "Definis GPG_KEY dans Installation/passbolt.env avant execution."
   exit 1
 fi
 
